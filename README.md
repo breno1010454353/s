@@ -6,6 +6,7 @@
 -- Serviços
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
 -- UI
@@ -21,7 +22,7 @@ frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BackgroundTransparency = 0.1
 frame.BorderSizePixel = 0
 frame.Active = true
-frame.Draggable = true -- ← Janela arrastável!
+frame.Draggable = true
 
 -- Canto Arredondado
 local corner = Instance.new("UICorner", frame)
@@ -51,7 +52,6 @@ button.Font = Enum.Font.GothamBold
 button.TextSize = 14
 button.Text = "Ativar ESP"
 button.Name = "ToggleESP"
-
 Instance.new("UICorner", button)
 
 -- Créditos
@@ -116,15 +116,29 @@ Players.PlayerRemoving:Connect(function(player)
 	removeESP(player)
 end)
 
--- Botão de Toggle
-button.MouseButton1Click:Connect(function()
+-- Função para ligar e desligar ESP (centralizada)
+local function toggleESP()
 	ESPEnabled = not ESPEnabled
 	button.Text = ESPEnabled and "Desativar ESP" or "Ativar ESP"
 
 	if not ESPEnabled then
-		for player, highlight in pairs(highlights) do
+		for player, _ in pairs(highlights) do
 			removeESP(player)
 		end
+	end
+end
+
+-- Botão de Toggle
+button.MouseButton1Click:Connect(function()
+	toggleESP()
+end)
+
+-- Detectar tecla F para alternar ESP
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+	if gameProcessedEvent then return end -- Ignorar se o jogo já processou o evento
+
+	if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.F then
+		toggleESP()
 	end
 end)
 
